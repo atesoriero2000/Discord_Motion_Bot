@@ -8,16 +8,23 @@
 
 //#define SSID "Tesfamily"
 //#define PASS "Tes8628125601"
-#define SSID "MyAltice 380803"
-#define PASS "6122-gold-78"
-#define WEBHOOK "https://discordapp.com/api/webhooks/1057796742545944677/DS4RZJDaAtrRw6LJQ5V0F5i3x0Zv4FSUscBg0w4_bfLB1Z95mtjWK9KOIantbvD--Sii"
+#define SSID  "WPI Sailbot"
+#define PASS   "YJKFMP6B8D"
+//#define SSID "MyAltice 380803"
+//#define PASS "6122-gold-78"
+//#define WEBHOOK "https://discordapp.com/api/webhooks/1057796742545944677/DS4RZJDaAtrRw6LJQ5V0F5i3x0Zv4FSUscBg0w4_bfLB1Z95mtjWK9KOIantbvD--Sii"
+#define WEBHOOK "https://discord.com/api/webhooks/1057187391338729502/Ouv3SCZVQcniGfEuoDIc8ryEyzVlT--8vy5JdpkK2KpTGojrpdZgwd1Ugj2twUTDYaTP"
+
+#define SSID "YOU WIFI NETWORK NAME HERE"
+#define PASS "YOUR WIFI PASSWORD HERE"
+#define WEBHOOK "YOUR DISCORD WEBHOOK HERE"
 #define TTS "false"
 
 #define WINDOW 10
 #define DEV_THRESHOLD 3
 
 #define T_LIGHTS 5000
-#define T_DEBOUNCE 10000
+#define T_DEBOUNCE 5000
 
 #define V_SOUND 340.0 //m/s
 #define ECHO 15
@@ -30,7 +37,7 @@ WiFiClientSecure client;
 HTTPClient https;
 
 MedianFilter2<float> medFilt(WINDOW);
-LowPass<1> lowPass(1, 1e3, true);
+LowPass<1> lowPass(.1, 1e3, true);
 SlidingWindow devBuff(WINDOW);
 
 long T_lastMovement = 0;
@@ -49,11 +56,11 @@ void setup() {
 
 void loop() {
   float d = sendPulse(TRIG);        // Get Raw Ultrasonic Value
-  if(d==0) d = devBuff.getMean();
+//  if(d<=0||d>100) return; //d = devBuff.getMean();
   float med = medFilt.AddValue(d);  // Median Filter
   float lp = lowPass.filt(med);     // Low Pass Filter (2nd Order)
   devBuff.update(lp);               // Deviation Circular Buffer
-  float dev = sqrt(devBuff.getMaxDeviation());
+  double dev = devBuff.getMaxDeviation();// / devBuff.getMean()*1000;
 
   long tElapsed = (millis()-T_lastMovement);
   if (!client.connected()) https.begin(client, WEBHOOK);
