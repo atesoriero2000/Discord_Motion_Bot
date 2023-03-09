@@ -8,18 +8,9 @@
 #include "LowPass.cpp" //https://youtu.be/eM4VHtettGg
 #include "SlidingWindow.h" //https://github.com/vkopli/Arduino_Sliding_Window_Library/
 
-//#define SSID "Tesfamily"
-//#define PASS "Tes8628125601"
-#define SSID  "WPI Sailbot"
-#define PASS   "YJKFMP6B8D"
-//#define SSID "MyAltice 380803"
-//#define PASS "6122-gold-78"
-//#define WEBHOOK "https://discordapp.com/api/webhooks/1057796742545944677/DS4RZJDaAtrRw6LJQ5V0F5i3x0Zv4FSUscBg0w4_bfLB1Z95mtjWK9KOIantbvD--Sii"
-#define WEBHOOK "https://discord.com/api/webhooks/1057187391338729502/Ouv3SCZVQcniGfEuoDIc8ryEyzVlT--8vy5JdpkK2KpTGojrpdZgwd1Ugj2twUTDYaTP"
-
-//#define SSID "YOU WIFI NETWORK NAME HERE"
-//#define PASS "YOUR WIFI PASSWORD HERE"
-//#define WEBHOOK "YOUR DISCORD WEBHOOK HERE"
+#define SSID "YOU WIFI NETWORK NAME HERE"
+#define PASS "YOUR WIFI PASSWORD HERE"
+#define WEBHOOK "YOUR DISCORD WEBHOOK HERE"
 #define TTS "false"
 
 #define WINDOW 10
