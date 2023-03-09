@@ -1,14 +1,25 @@
+#include <NTPClient.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
+#include <WiFiUdp.h>
 
 #include "MedianFilterLib2.h" //https://www.arduinolibraries.info/libraries/median-filter-lib2
 #include "LowPass.cpp" //https://youtu.be/eM4VHtettGg
 #include "SlidingWindow.h" //https://github.com/vkopli/Arduino_Sliding_Window_Library/
 
-#define SSID "YOU WIFI NETWORK NAME HERE"
-#define PASS "YOUR WIFI PASSWORD HERE"
-#define WEBHOOK "YOUR DISCORD WEBHOOK HERE"
+//#define SSID "Tesfamily"
+//#define PASS "Tes8628125601"
+#define SSID  "WPI Sailbot"
+#define PASS   "YJKFMP6B8D"
+//#define SSID "MyAltice 380803"
+//#define PASS "6122-gold-78"
+//#define WEBHOOK "https://discordapp.com/api/webhooks/1057796742545944677/DS4RZJDaAtrRw6LJQ5V0F5i3x0Zv4FSUscBg0w4_bfLB1Z95mtjWK9KOIantbvD--Sii"
+#define WEBHOOK "https://discord.com/api/webhooks/1057187391338729502/Ouv3SCZVQcniGfEuoDIc8ryEyzVlT--8vy5JdpkK2KpTGojrpdZgwd1Ugj2twUTDYaTP"
+
+//#define SSID "YOU WIFI NETWORK NAME HERE"
+//#define PASS "YOUR WIFI PASSWORD HERE"
+//#define WEBHOOK "YOUR DISCORD WEBHOOK HERE"
 #define TTS "false"
 
 #define WINDOW 10
@@ -33,6 +44,10 @@ SlidingWindow devBuff(WINDOW);
 
 long T_lastMovement = 0;
 
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "north-america.pool.ntp.org", 19*60*60, 6000);
+
+
 void setup() {
   pinMode(ECHO, INPUT);
   pinMode(R_LED, OUTPUT);
@@ -40,12 +55,16 @@ void setup() {
   pinMode(USB, OUTPUT);
   pinMode(TRIG, OUTPUT);
 
+  timeClient.begin();
   connectWIFI();
   setupDiscord();
   Serial.begin(9600);
 }
 
 void loop() {
+  
+  timeClient.update();//TODO: update less frequently
+  
   float d = sendPulse(TRIG);        // Get Raw Ultrasonic Value
 //  if(d<=0||d>100) return; //d = devBuff.getMean();
   float med = medFilt.AddValue(d);  // Median Filter
@@ -57,7 +76,7 @@ void loop() {
   if (!client.connected()) https.begin(client, WEBHOOK);
   if(tElapsed>T_DEBOUNCE && (dev > DEV_THRESHOLD)){
     digitalWrite(USB, HIGH);
-    sendDiscord("Movement Detected");
+    sendDiscord("Movement Detected: " + timeClient.getFormattedTime());
     T_lastMovement = millis();
   }
 
@@ -97,9 +116,10 @@ void connectWIFI() {
 }
 
 void setupDiscord(){
+  timeClient.update();
   client.setInsecure();
   https.begin(client, WEBHOOK);
-  sendDiscord("Alarm Connected");
+  sendDiscord("Alarm Connected: " + timeClient.getFormattedTime());
 }
 
 //https://www.instructables.com/Send-a-Message-on-Discord-Using-Esp32-Arduino-MKR1/
